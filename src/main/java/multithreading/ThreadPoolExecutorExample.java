@@ -50,8 +50,7 @@ public class ThreadPoolExecutorExample {
     final int keepAliveTime = 100; // 100 seconds
     this.executor = new ThreadPoolExecutor(
       corePoolSize, maximumPoolSize, keepAliveTime,
-      TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(5),
-      new RejectHandler());
+      TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(5), new RejectHandler());
   }
 
   public static void main(String[] args) {
