@@ -45,9 +45,13 @@ public class ThreadPoolExecutorExample {
      * itself complete, until there were only 5 threads in the pool - the
      * "core" of the pool.
      */
+    final int corePoolSize = Runtime.getRuntime().availableProcessors(); // assume 4
+    final int maximumPoolSize = 4; // maximum 4 threads can be created
+    final int keepAliveTime = 100; // 100 seconds
     this.executor = new ThreadPoolExecutor(
-        4, 4, 100, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(5),
-        new RejectHandler());
+      corePoolSize, maximumPoolSize, keepAliveTime,
+      TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(5),
+      new RejectHandler());
   }
 
   public static void main(String[] args) {
@@ -99,7 +103,7 @@ class WorkerClass implements Runnable {
 }
 
 /**
- * RESPONSE
+ * SAMPLE RESPONSE
  * ------------------------------------------------------------------------
  * Task WorkerClass{name='Thread-9'} rejected from java.util.concurrent
  * .ThreadPoolExecutor@66d3c617[Running, pool size = 4, active threads = 4,
