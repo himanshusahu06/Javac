@@ -8,7 +8,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Multi item Consumer Producer Factory
+ * Consumer Producer Factory
  *
  * 1. one of producer has acquired the lock, producer is producing the items and as soon as item is available,
       it signals all the consumer threads waiting on the same lock.
@@ -45,12 +45,12 @@ class ProductFactory {
       lock.lock();
       if (productList.size() == capacity) {
         System.out.println("Producer " + Thread.currentThread().getName() + " has switched to wait state.");
-        condition.await();
+        condition.await();    // buffer is full, wait for consumption
       } else {
         System.out.println(Thread.currentThread().getName() +  " Produced : "  + item);
         productList.add(item);
         item++;
-        condition.signalAll();
+        condition.signalAll();  // as soon as produce any item, notify the consumers
       }
       lock.unlock();
       Thread.sleep(300);
@@ -62,11 +62,11 @@ class ProductFactory {
       lock.lock();
       if (productList.isEmpty()) {
         System.out.println("Consumer " + Thread.currentThread().getName() + " has switched to wait state.");
-        condition.await();
+        condition.await();    // buffer is full, wait for production
       } else {
         System.out.println(Thread.currentThread().getName() +  " Consumed : "  + item);
         productList.remove(--item);
-        condition.signalAll(); // as soon as produce any item, invoke the consumer
+        condition.signalAll(); // as soon as consume any item, invoke the producers
       }
       lock.unlock();
       Thread.sleep(200);
