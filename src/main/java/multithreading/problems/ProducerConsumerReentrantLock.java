@@ -10,28 +10,28 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Multi item Consumer Producer Factory
  *
- * 1. producer has acquired the lock, producer is producing the items until buffer is full
- * 2. once buffer is full, producer is going to signal consumer thread, will go to waiting state and release the lock
- * 3. since producer has released the lock and consumer is trying to acquire the lock, it will get the lock ownership
- * 4. now producer is sleeping and consumer is consuming the product
- * 5. when consumer has finished consuming, it will signal the producer thread, will go to waiting state and release the lock
- * 6. REPEAT STEP #1
- * 7. this is bounded buffer where consumer and producer will take turn to produce and
- *    consume the product which is not efficient because once consumer has consumed the product,
- *    producer has capability to produce it but it is not producing until consumer is asking it to produce.
+ * 1. one of producer has acquired the lock, producer is producing the items and as soon as item is available,
+      it signals all the consumer threads waiting on the same lock.
+ * 2. once buffer is full, producer will go to waiting state.
+ * 3. lock will be released after producing the item, so that awakened consumer thread can consume the items.
+ * 4. once consumer has acquired the lock, it will keep consuming the items and will keep awaking producer
+      after each consumption (because once item is consumed, buffer is ready to be filled by producer).
+ * 5. if consumer has finished the consumption, it will go to waiting state.
+ * 6. STEPS WILL BE REPEATED BASED ON WHO HAS ACQUIRED THE LOCK (🔒 PRODUCER OR CONSUMER)
+ 
+ * 7. https://en.wikipedia.org/wiki/Producer%E2%80%93consumer_problem
  */
 class ProductFactory {
-
+  private Lock lock;
+  private Condition condition;
   private List<Integer> productList;
   private int capacity = 5;
   private int item = 0;
-  private Lock lock;
-  private Condition condition;
 
   ProductFactory() {
-    productList = new ArrayList<Integer>();
-    lock = new ReentrantLock();
-    condition = lock.newCondition();
+    this.productList = new ArrayList<Integer>();
+    this.lock = new ReentrantLock();
+    this.condition = lock.newCondition();
   }
 
   ProductFactory(int capacity) {
@@ -40,48 +40,45 @@ class ProductFactory {
   }
 
   void produce() throws InterruptedException {
+
     while (true) {
-      System.out.println("Producer signaled by other thread.");
       lock.lock();
-      while (productList.size() != capacity) {
-        System.out.println("Produced: " + item);
+      if (productList.size() == capacity) {
+        System.out.println("Producer " + Thread.currentThread().getName() + " has switched to wait state.");
+        condition.await();
+      } else {
+        System.out.println(Thread.currentThread().getName() +  " Produced : "  + item);
         productList.add(item);
-        ++item;
-        Thread.sleep(800);  // wait for some time so that output can be little bit nicer
+        item++;
+        condition.signalAll();
       }
-      System.out.println("Waiting for consumer to consume the item.");
-      condition.signal();   // awake the consumer thread
-      System.out.println("Producer switched to waiting mode.");
-      condition.await();    // go to waiting state
-      lock.unlock();        // release the lock so that consumer can start consuming
+      lock.unlock();
+      Thread.sleep(300);
     }
   }
 
   void consume() throws InterruptedException {
     while (true) {
-      System.out.println("Consumer signaled by other thread.");
       lock.lock();
-      while (productList.size() != 0) {
-        System.out.println("Consumed: " + item);
+      if (productList.isEmpty()) {
+        System.out.println("Consumer " + Thread.currentThread().getName() + " has switched to wait state.");
+        condition.await();
+      } else {
+        System.out.println(Thread.currentThread().getName() +  " Consumed : "  + item);
         productList.remove(--item);
-        Thread.sleep(800);  // wait for some time so that output can be little bit nicer
+        condition.signalAll(); // as soon as produce any item, invoke the consumer
       }
-      System.out.println("Waiting for producer to produce the item.");
-      condition.signal(); // signal the producer to produce the item
-      System.out.println("Consumer switched to waiting mode.");
-      condition.await();  // go to wait mode and can be awakened by producer thread
-      lock.unlock();      // release the lock so that producer can acquire the lock
+      lock.unlock();
+      Thread.sleep(200);
     }
   }
 }
 
-/**
- * Producer consumer problem with ReentrantLock
- */
-public class ProducerConsumerReentrantLock {
+class ProducerConsumerAsync {
   public static void main(String[] args) {
-    final ProductFactory productFactory = new ProductFactory();
-    Thread prodThread = new Thread(new Runnable() {
+    final ProductFactory productFactory = new ProductFactory(10);
+
+    Thread t1 = new Thread(new Runnable() {
       @Override
       public void run() {
         try {
@@ -91,26 +88,62 @@ public class ProducerConsumerReentrantLock {
         }
       }
     });
-    Thread consThread = new Thread(new Runnable() {
+    Thread t2 = new Thread(new Runnable() {
       @Override
       public void run() {
         try {
-          Thread.sleep(10000);  // start consumer after producer
           productFactory.consume();
         } catch (final Exception ex) {
           ex.printStackTrace();
         }
       }
     });
+    Thread t3 = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Thread.sleep(3000);
+          productFactory.consume();
+        } catch (final Exception ex) {
+          ex.printStackTrace();
+        }
+      }
+    });
+    Thread t4 = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          productFactory.produce();
+        } catch (final Exception ex) {
+          ex.printStackTrace();
+        }
+      }
+    });
+    Thread t5 = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          productFactory.produce();
+        } catch (final Exception ex) {
+          ex.printStackTrace();
+        }
+      }
+    });
 
-    prodThread.start();
-    consThread.start();
+    t1.start();
+    t2.start();
+    t3.start();
+    t4.start();
+    t5.start();
 
     try {
-      prodThread.join();
-      consThread.join();
+      t1.join();
+      t2.join();
+      t3.join();
+      t4.join();
+      t5.join();
     } catch (final InterruptedException ie) {
       ie.printStackTrace();
     }
   }
-}
+
