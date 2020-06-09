@@ -1,6 +1,3 @@
-package com.nutanix.prism.notifications.client;
-
-
 /**
  * Binary search tree interface that describe list of operation can be performed in a BST
  *
