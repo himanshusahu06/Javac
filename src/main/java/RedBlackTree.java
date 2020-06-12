@@ -75,9 +75,9 @@ class RedBlackBinarySearchTree<Key extends Comparable<Key>> implements BinarySea
             root.right = insert(root.right, key);
         }
 
-        //////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////
         // this piece of code makes a tree red black and self balanced//
-        //////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////
 
         // RULE 1: left link is black and right link is red, rotate left
         if (!isRed(root.left) && isRed(root.right)) {
