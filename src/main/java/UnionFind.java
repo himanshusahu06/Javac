@@ -15,7 +15,7 @@ public class UnionFind {
         int rootP = root(p);
         int rootQ = root(q);
         if (treeDepth[rootP] < treeDepth[rootQ]) {
-            // root of parent of smaller tree will be root of larger tree
+            // OPTIMIZATION 1: make smaller tree's root to the root of larger tree
             id[rootP] = rootQ;
             treeDepth[rootQ] += treeDepth[rootP];
         } else {
@@ -30,7 +30,8 @@ public class UnionFind {
 
     private int root(int p) {
         while (p != id[p]) {
-            id[p] = id[id[p]]; // set node's parent to it's grand parent
+            // OPTIMIZATION 2: (path compression) set node's parent to it's grand parent
+            id[p] = id[id[p]];
             p = id[p];
         }
         return p;
