@@ -1,7 +1,7 @@
 import java.util.*;
 
 /**
- * Kosaraju Strongly Connected Algorithm
+ * Kosaraju Strongly Connected Component Algorithm
  * 1. do DFS in reverse of graph and get the ordering
  * 2. Following the same ordering, run dfs and strongly connect all nodes in the same dfs
  */
