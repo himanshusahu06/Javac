@@ -28,28 +28,39 @@ public class SuffixArray {
     }
 }
 
-class LongestRepeatedSubstringRunner {
-    public static void main(String[] args) {
-        int longestSuffixSize = 0;
-        String longestSuffix = null;
-        String[] suffixArray = new SuffixArray("AACAAGTTTACAAGC", false).getSuffixArray();
-        for (int i = 0; i < suffixArray.length - 1; i++) {
-            String commonSuffix = getCommonSuffix(suffixArray[i], suffixArray[i + 1]);
-            if (commonSuffix.length() > longestSuffixSize) {
-                longestSuffixSize = commonSuffix.length();
-                longestSuffix = commonSuffix;
-            }
-        }
-        System.out.println("Longest repeated string is : " + longestSuffix);
+class LongestRepeatingSubstring {
+    private final String str;
+
+    public LongestRepeatingSubstring(String str) {
+        this.str = str;
     }
 
-    private static String getCommonSuffix(String a, String b) {
+    public String get() {
+        String longestSuffix = "";
+        String[] suffixArray = new SuffixArray(str, false).getSuffixArray();
+        for (int i = 0; i < suffixArray.length - 1; i++) {
+            int len = longestCommonPrefix(suffixArray[i], suffixArray[i + 1]);
+            if (len > longestSuffix.length()) {
+                longestSuffix = suffixArray[i].substring(0, len);
+            }
+        }
+        return longestSuffix;
+    }
+
+    private int longestCommonPrefix(String a, String b) {
         int size = Math.min(a.length(), b.length());
         for (int i = 0; i < size; i++) {
             if (a.charAt(i) != b.charAt(i)) {
-                return a.substring(0, i);
+                return i;
             }
         }
-        return a.substring(0, size);
+        return size;
+    }
+}
+
+class LongestRepeatedSubstringRunner {
+    public static void main(String[] args) {
+        LongestRepeatingSubstring longestRepeatingSubstring = new LongestRepeatingSubstring("AACAAGTTTACAAGC");
+        System.out.println("Longest repeated string is : " + longestRepeatingSubstring.get());
     }
 }
