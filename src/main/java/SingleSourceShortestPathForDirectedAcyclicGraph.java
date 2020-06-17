@@ -39,13 +39,13 @@ public class SingleSourceShortestPathForDirectedAcyclicGraph {
             int vertex = topologicalOrdering.get(index);
             if (vertex == source || parent[vertex] != -1) {
                 // for each node which is either vertex or reachable from vertex
-                relaxEdge(vertex, distFromSource);
+                relaxEdges(vertex, distFromSource);
             }
             index++;
         }
     }
 
-    private void relaxEdge(int v, int[] distFromSource) {
+    private void relaxEdges(int v, int[] distFromSource) {
         for (int w = 0; w < graph.size(); w++) {
             int edgeWeight = graph.edges(v)[w];
             if (edgeWeight > 0 && distFromSource[v] + edgeWeight < distFromSource[w]) {
