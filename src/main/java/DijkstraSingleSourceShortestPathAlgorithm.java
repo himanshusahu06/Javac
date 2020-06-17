@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Dijkstra algorithm is applicable for both directed and undirected graph
+ * Dijkstra algorithm is applicable for both directed and undirected graph but it can
+ * not work if graph has atleast one -ve weighted edge
  */
 public class DijkstraSingleSourceShortestPathAlgorithm {
     private final WeightedGraph graph;
