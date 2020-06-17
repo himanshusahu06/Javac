@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Prim's algorithm
+ * Prim's algorithm is applicable to undirected graph and can work with -ve weights
  * 1. create two set - mstSet and nonMstSet
  * 2. pick a random vertex
  * 3. loop until N-1 times
