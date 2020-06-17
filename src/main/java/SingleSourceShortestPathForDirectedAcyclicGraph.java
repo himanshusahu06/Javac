@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Below algorithm runs faster than Dijkstra Algorithm when graph is direct acyclic (DAG)
+ * Below algorithm runs faster than Dijkstra Algorithm when graph is direct acyclic (DAG) with complexity O(V+E)
  * 1. topologically sort the graph
  * 2. in the topological sort order, find the source
  * 3. once source is found, adjust the distance of adjacent nodes
