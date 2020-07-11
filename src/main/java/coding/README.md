@@ -1,6 +1,8 @@
 ## TreeMap useful methods
 
+```java
 TreeMap<K, V> treeMap = new TreeMap<>();
+```
 
 **Map.Entry<K,V> ceilingEntry(K key)** - key-value pair having the least key, greater than or equal to the specified key, or null if there is no such key. 
 
@@ -20,4 +22,6 @@ TreeMap<K, V> treeMap = new TreeMap<>();
 
 ## TreeSet useful methods
 
-TreeMap<K> treeMap = new TreeMap<>();
+```java
+TreeSet<K> treeSet = new TreeSet<>();
+```
