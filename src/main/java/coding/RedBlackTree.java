@@ -11,6 +11,8 @@ interface BinarySearchTree<Key extends Comparable<Key>> {
 
 /**
  * Left leaning red black tree implementation of balanced BST
+ * Left leaning red black is where a parent can only have red node in it's left subtree and all root to leaf
+ * path must contain exact number of black nodes.
  *
  * @param <Key> object for which binary search tree is built for
  */
