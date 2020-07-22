@@ -1,3 +1,5 @@
-## Game of bits
+# Game of bits
 
-* check if nth bit of x is set or not `(1 << n) & x != 0`
+* test bit `A & (1 << bit) != 0`
+* set bit `A | (1 << bit)`
+* clear bit `A & ~(1 << bit)`
